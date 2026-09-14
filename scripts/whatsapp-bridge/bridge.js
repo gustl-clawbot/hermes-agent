@@ -33,6 +33,7 @@ import qrcode from 'qrcode-terminal';
 import { matchesAllowedUser, parseAllowedUsers } from './allowlist.js';
 import { createOutboundIdTracker } from './outbound_ids.js';
 import { classifyOwnerMessageGate } from './owner_message_gate.js';
+import { initNewsletterCollector, isNewsletterChat } from '/home/gustl/.hermes/scripts/wa-newsletter-collector.mjs';
 import {
   buildPollPayload,
   createReconnectScheduler,
@@ -370,6 +371,12 @@ function rememberSentId(id) {
 }
 
 let sock = null;
+
+// Newsletter-Collector (Option A, 11.09.2026): sammelt WhatsApp-Channel-News
+// still nach ~/.hermes/references/ki-news-everlast/ — siehe wa-newsletter-collector.mjs.
+const newsletterCollectorRef = initNewsletterCollector({
+  log: (msg) => console.log(JSON.stringify({ event: 'newsletter_collector', message: msg })),
+});
 let connectionState = 'disconnected';
 
 function emitPairEvent(event) {
@@ -527,6 +534,17 @@ async function startSocket() {
       if (!msg.message) continue;
 
       const chatId = msg.key.remoteJid;
+      // Newsletter-Channels (z. B. Everlast AI • KI News) sind Broadcast-
+      // Kanaele: still sammeln (Option A), niemals in den Agenten-DM-Pfad.
+      // Muss VOR der Allowlist laufen — Kanal-Absender sind keine DMs.
+      if (isNewsletterChat(chatId)) {
+        try {
+          newsletterCollectorRef.handleInbound(msg);
+        } catch (err) {
+          console.warn('[bridge] newsletter collector error:', err.message);
+        }
+        continue;
+      }
       const senderId = msg.key.participant || chatId;
       const isGroup = chatId.endsWith('@g.us');
       const senderNumber = senderId.replace(/@.*/, '');
