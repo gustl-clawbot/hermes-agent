@@ -190,14 +190,44 @@ def test_seedance_25_string_duration_up_to_30():
     assert payload["generate_audio"] is True
 
 
-def test_gemini_omni_flash_is_image_only():
-    """Gemini Omni Flash has no t2v endpoint on FAL — text jobs must
-    error cleanly instead of submitting to a None endpoint."""
+def test_wan_30_audio_toggle_uses_family_key_and_start_image_url():
+    """Wan 3.0's schema names the audio toggle `audio` (not `generate_audio`), takes
+    `start_image_url` on i2v and an integer duration; veo3.1 keeps `generate_audio`."""
+    from plugins.video_gen.fal import FAL_FAMILIES, _build_payload
+
+    kw = dict(prompt="x", duration=7, aspect_ratio="16:9", resolution="720p", negative_prompt=None, audio=True, seed=None)
+    p = _build_payload(FAL_FAMILIES["wan-3.0"], image_url="https://i.png", **kw)
+    assert p["audio"] is True and "generate_audio" not in p
+    assert p["start_image_url"] == "https://i.png" and p["duration"] == 7
+    assert _build_payload(FAL_FAMILIES["veo3.1"], image_url=None, **kw)["generate_audio"] is True
+
+
+def test_gemini_omni_flash_v11_is_dual_modality():
+    """v1.1 (Aug 2026) added a text-to-video endpoint; both modalities
+    must route to the versioned v1.1 endpoints."""
     from plugins.video_gen.fal import FAL_FAMILIES
 
     meta = FAL_FAMILIES["gemini-omni-flash"]
-    assert meta.get("text_endpoint") is None
-    assert meta.get("image_endpoint")
+    assert meta["text_endpoint"] == "google/gemini-omni-flash/v1.1/text-to-video"
+    assert meta["image_endpoint"] == "google/gemini-omni-flash/v1.1/image-to-video"
+
+
+def test_text_only_job_errors_cleanly_for_i2v_only_family(monkeypatch):
+    """Catalog-shape guard: a family without a text endpoint must error cleanly
+    instead of submitting to a None endpoint. Every cataloged family is now
+    dual-modality, so the guard is exercised with a synthetic family."""
+    from plugins.video_gen import fal as fal_plugin
+    from plugins.video_gen.fal import FALVideoGenProvider, _family
+
+    synthetic = _family("Synthetic i2v", "~1s", "cheap", "test", None, "example/i2v-only/image-to-video", durations=(3, 10), duration_int=True)
+    monkeypatch.setattr(fal_plugin, "_fal_video_available", lambda: True)
+    monkeypatch.setattr(fal_plugin, "_load_fal_client", lambda: object())
+    monkeypatch.setattr(fal_plugin, "_resolve_family", lambda explicit: ("synthetic", synthetic))
+    monkeypatch.setattr(fal_plugin, "_submit_fal_video_request", lambda *a, **k: pytest.fail("submitted to a None endpoint"))
+
+    result = FALVideoGenProvider().generate("a dog running")
+    assert result["success"] is False
+    assert result["error_type"] == "modality_unsupported"
 
 
 def test_every_family_has_required_metadata():
@@ -502,13 +532,14 @@ class TestPayloadBuilder:
         assert p["duration"] == expected
         assert type(p["duration"]) is type(expected)
 
-    def test_i2v_only_families_declare_no_text_endpoint(self):
-        """Catalog invariant: Gemini Omni Flash animates an existing image only."""
+    def test_every_family_declares_both_endpoints(self):
+        """Catalog invariant: since Gemini Omni Flash 1.1 every family is
+        dual-modality — both endpoints must be non-empty strings."""
         from plugins.video_gen.fal import FAL_FAMILIES
 
-        meta = FAL_FAMILIES["gemini-omni-flash"]
-        assert meta.get("text_endpoint") is None
-        assert meta["image_endpoint"]
+        for fid, meta in FAL_FAMILIES.items():
+            assert meta.get("text_endpoint"), fid
+            assert meta.get("image_endpoint"), fid
 
     def test_ltx_omits_duration_aspect_resolution(self):
         """LTX 2.3 doesn't declare duration/aspect/resolution enums —
