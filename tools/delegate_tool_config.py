@@ -488,8 +488,14 @@ def _resolve_child_runtime(
     # transport would run the child somewhere the user explicitly routed it away from. Normally unreachable
     # via delegate_task, which pre-validates the command in _resolve_delegation_credentials.
     if override_acp_command:
-        # Forced ACP transport requires provider copilot-acp for run_agent to init the client.
-        effective_provider, effective_api_mode = "copilot-acp", "chat_completions"
+        # Forced ACP transport needs a provider whose profile supplies the ACP client. Keep the
+        # provider that produced this command (an external-process provider, e.g. copilot-acp or
+        # an out-of-tree one like dsh-acp) instead of hardcoding copilot-acp: the hardcode made
+        # every other ACP runtime unreachable through delegate_task, spawning the wrong binary.
+        if not (override_provider or "").strip():
+            effective_provider, effective_api_mode = "copilot-acp", "chat_completions"
+        else:
+            effective_provider, effective_api_mode = override_provider, "chat_completions"
 
     # Reasoning: delegation.reasoning_effort > parent. Keep the raw value — a
     # YAML ``false`` must disable thinking, not coerce to "" and inherit.
