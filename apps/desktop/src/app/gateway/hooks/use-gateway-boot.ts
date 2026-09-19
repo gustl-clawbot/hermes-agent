@@ -39,6 +39,7 @@ import {
   gatewayActivationEpoch,
   isActivePrimary,
   liveSecondaryConnectionIds,
+  parkSecondariesForRetiredBackend,
   pruneSecondaryGateways,
   reconnectSecondaryGateways,
   reportPrimaryGatewayState,
@@ -357,7 +358,7 @@ export function useGatewayBoot({
     }
 
     const attemptReconnect = async (manual?: { profile: string; activationEpoch: number }) => {
-      if (cancelled || reconnecting || gatewayOpen() || $gatewaySwitching.get()) {
+      if (cancelled || primaryReauthError || reconnecting || gatewayOpen() || $gatewaySwitching.get()) {
         return
       }
 
@@ -459,28 +460,29 @@ export function useGatewayBoot({
         if (!cancelled && isGatewayReauthRequired(err) && !reauthNotified) {
           primaryReauthError = err instanceof Error ? err.message : String(err)
           syncPrimaryReauthError()
-
-          if (isActivePrimary()) {
-            reauthNotified = true
-            // Plain "signed out" copy; the raw ticket/HTTP text stays under
-            // Details. The boot overlay carries the sign-in flow itself, so
-            // the button hands off to it (desktop-14).
-            notify({
-              kind: 'error',
-              title: translateNow('boot.errors.gatewaySignInRequired'),
-              message: translateNow('boot.errors.gatewaySignInRequiredDetail'),
-              detail: primaryReauthError,
-              action: {
-                label: translateNow('boot.errors.signInAgain'),
-                onClick: () => failDesktopBoot(primaryReauthError ?? '')
-              }
-            })
-          }
+          reauthNotified = true
+          // Plain "signed out" copy; the raw ticket/HTTP text stays under
+          // Details. In the foreground the boot overlay carries the sign-in
+          // flow, so the button hands off to it (desktop-14). A parked
+          // background primary no longer retries by itself, so it must still
+          // offer a way to Settings instead of failing silently.
+          notify({
+            kind: 'error',
+            title: translateNow('boot.errors.gatewaySignInRequired'),
+            message: translateNow('boot.errors.gatewaySignInRequiredDetail'),
+            detail: primaryReauthError,
+            action: isActivePrimary()
+              ? {
+                  label: translateNow('boot.errors.signInAgain'),
+                  onClick: () => failDesktopBoot(primaryReauthError ?? '')
+                }
+              : RECOVERY_ACTIONS.openGateways()
+          })
         }
       } finally {
         reconnecting = false
 
-        if (!cancelled && !gatewayOpen() && !$gatewaySwitching.get()) {
+        if (!cancelled && !primaryReauthError && !gatewayOpen() && !$gatewaySwitching.get()) {
           if (reconnectFailingSince === null) {
             reconnectFailingSince = Date.now()
           }
@@ -508,7 +510,7 @@ export function useGatewayBoot({
     }
 
     function scheduleReconnect(manual?: { profile: string; activationEpoch: number }) {
-      if (cancelled || reconnecting || reconnectTimer !== null || gatewayOpen() || $gatewaySwitching.get()) {
+      if (cancelled || primaryReauthError || reconnecting || reconnectTimer !== null || gatewayOpen() || $gatewaySwitching.get()) {
         return
       }
 
@@ -1013,13 +1015,16 @@ export function useGatewayBoot({
       if (!isActivePrimary()) {
         activeGateway()?.close()
 
-        if (!(await ensureActiveGatewayOpen())) {
+        if (!(await ensureActiveGatewayOpen({ explicit: true }))) {
           throw new Error('Hermes gateway is not connected')
         }
 
         return
       }
 
+      // Only explicit recovery may retry a credential that requires sign-in.
+      primaryReauthError = null
+      reauthNotified = false
       gateway.close()
       clearReconnectTimer()
       reconnectAttempt = 0
@@ -1055,6 +1060,17 @@ export function useGatewayBoot({
         // owner hints naming it so its sessions are not pinned (fail-closed)
         // to a route that no longer exists.
         forgetSessionOwnerHintsForConnection(payload.connectionId)
+      }
+    })
+
+    // Cooperative pool retirement: main is stopping a pooled backend so a
+    // foreground open elsewhere gets its slot. Park the scopes riding it now,
+    // before the socket drops, so neither the 'closed' state nor the next
+    // focus/wake nudge redials into the slot it vacated. The tile keeps its
+    // card; the next click on it re-arms the scope.
+    const offPoolRetiring = desktop.onPoolBackendRetiring?.(payload => {
+      if (payload && typeof payload.poolKey === 'string') {
+        parkSecondariesForRetiredBackend(payload.poolKey)
       }
     })
 
@@ -1390,6 +1406,7 @@ export function useGatewayBoot({
       offPowerResume?.()
       offConnectionApplied?.()
       offConnectionsChanged?.()
+      offPoolRetiring?.()
       offGatewayReconnect()
       offActiveGatewayReauth()
       offActiveStateReauth()
