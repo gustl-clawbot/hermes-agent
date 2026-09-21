@@ -14,11 +14,7 @@ export const de = defineLocale({
     grant: 'Neu verbinden',
     connected: 'Verbunden',
     checking: 'Deine Apps werden geprüft…',
-    waitingSignIn: 'Warte, bis du die Anmeldung abgeschlossen hast…',
     notConnected: 'Verbindung fehlgeschlagen',
-    notAvailable: 'Nicht verfügbar',
-    startWith: count => `Starte die Aufgabe mit ${count} ${count === 1 ? 'verbundener App' : 'verbundenen Apps'}`,
-    startWithout: 'Ohne Verbindungen starten',
     skipped: 'Übersprungen',
     disabled: 'Nicht verfügbar',
     failed: 'Verbindung fehlgeschlagen',
@@ -26,18 +22,14 @@ export const de = defineLocale({
     opening: 'Anmeldung wird geöffnet…',
     waiting: 'Schließe die Verbindung im Browser ab…',
     timeout: 'Warte noch auf die Freigabe.',
-    keepWaiting: 'Weiter warten',
     refresh: 'Status aktualisieren',
-    statusError: 'Verbindungen konnten nicht geprüft werden. Versuche zu aktualisieren.',
     connectError: 'Freigabe konnte nicht gestartet werden. Versuche es erneut.',
+    connectErrorFor: app => `Die Freigabe für ${app} konnte nicht gestartet werden.`,
     unavailable: 'Verbindungen sind für diese Sitzung nicht verfügbar.',
     ownerMissing: 'Öffne diese Konversation neu, um ihre Verbindungen zu verwalten.',
     search: 'App finden',
     empty: 'Keine passende App',
     disclaimer: 'Das Verbinden ist freiwillig. Gib nur den Apps Zugriff, die Hermes verwenden soll.',
-    connectTitle: app => `Mit ${app} verbinden?`,
-    describe: app =>
-      `Hermes meldet sich bei ${app} in deinem Browser an und fragt nach, bevor dort etwas gelesen wird.`,
     execution: 'Verbindungs-Tools'
   },
   sessionImport: {
@@ -150,17 +142,33 @@ export const de = defineLocale({
       backgroundExited: 'Der Hermes-Hintergrundprozess wurde beendet.',
       backgroundExitedDuringStartup: 'Der Hermes-Hintergrundprozess wurde während des Starts beendet.',
       backendStopped: 'Backend gestoppt',
+      restartHermes: 'Hermes neu starten',
+      openLogs: 'Logs öffnen',
       desktopBootFailed: 'Desktop-Start fehlgeschlagen',
       gatewayConnectionLost: 'Verbindung zum Gateway verloren',
       gatewayConnectionLostDetail:
         'Im Hintergrund wird weiterhin erneut versucht. Du kannst weiterlesen und weiter schreiben – öffne die Gateway-Einstellungen, falls das anhält.',
+      reconnectNow: 'Jetzt neu verbinden',
+      connectionSettings: 'Verbindungseinstellungen',
       gatewaySignInRequired: 'Gateway-Sign-in erforderlich',
+      gatewaySignInRequiredDetail:
+        'Melde dich erneut an, um wieder zu verbinden. Deine Chats und Einstellungen sind sicher.',
+      signInAgain: 'Erneut anmelden',
       ipcBridgeUnavailable: 'Der Desktop-IPC-Bridge ist nicht verfügbar.'
+    },
+    causes: {
+      exitedEarly: 'Der Hintergrunddienst von Hermes hat direkt nach dem Start aufgehört.',
+      timedOut: 'Der Hintergrunddienst von Hermes hat nicht rechtzeitig geantwortet.',
+      permission: 'Hermes konnte nicht in seinen Datenordner schreiben (Berechtigungsproblem).',
+      diskFull: 'Die Festplatte ist voll, deshalb konnte Hermes nicht starten.',
+      portInUse: 'Ein anderes Programm verwendet den Netzwerkport, den Hermes braucht.',
+      installMissing: 'Ein Teil der Hermes-Installation fehlt. Wähl Installation reparieren, um sie wiederherzustellen.'
     },
     failure: {
       title: 'Hermes konnte nicht gestartet werden',
       description:
         'Das Hintergrund-Gateway ist nicht hochgekommen. Probier einen der Wiederherstellungsschritte unten. Nichts davon löscht deine Chats oder Einstellungen.',
+      details: 'Details',
       remoteTitle: 'Remote-Gateway-Sign-in erforderlich',
       remoteDescription:
         'Deine Remote-Gateway-Session ist abgelaufen. Melde dich erneut an, um dich neu zu verbinden. Nichts davon löscht deine Chats oder Einstellungen.',
@@ -197,7 +205,7 @@ export const de = defineLocale({
     }
   },
   notifications: {
-    region: 'Notifications',
+    region: 'Benachrichtigungen',
     hide: 'Ausblenden',
     show: 'Anzeigen',
     more: count => `${count} weitere ${count === 1 ? 'Benachrichtigung' : 'Benachrichtigungen'}`,
@@ -221,21 +229,34 @@ export const de = defineLocale({
       errorTitle: 'MCP-Server nicht erreichbar',
       errorMessage: name => `${name} MCP hat den Health-Check nicht bestanden.`,
       signIn: 'Anmelden',
-      view: 'Anzeigen'
+      view: 'Anzeigen',
+      disable: 'Deaktivieren',
+      disabledMessage: name =>
+        `${name} MCP deaktiviert. Du kannst es jederzeit über Fähigkeiten → MCP wieder aktivieren.`,
+      disableFailed: name => `${name} MCP konnte nicht deaktiviert werden.`
     },
     errors: {
       elevenLabsNeedsKey: 'ElevenLabs-STT braucht ELEVENLABS_API_KEY.',
       elevenLabsRejectedKey: 'ElevenLabs hat den API-Key abgelehnt (401).',
       diskFull: 'Festplatte voll – schaffe etwas Speicherplatz und versuch es dann noch einmal.',
+      storageFailure:
+        'Hermes konnte nicht in seinen Datenordner speichern. Öffne Wartung, um es zu prüfen und zu reparieren.',
       gatewayAuthFailed: 'Gateway-Authentifizierung fehlgeschlagen – überprüfe deinen API_SERVER_KEY.',
       methodNotAllowed:
         'Das Desktop-Backend hat diese Anfrage abgelehnt (405 Method Not Allowed). Versuch, Hermes Desktop neu zu starten.',
       microphonePermission: 'Die Mikrofonberechtigung wurde verweigert.',
-      openaiRejectedApiKey: 'OpenAI hat den API-Key abgelehnt.',
-      openaiRejectedApiKeyWithStatus: status => `OpenAI hat den API-Key abgelehnt (${status} invalid_api_key).`,
+      openaiRejectedApiKey:
+        'OpenAI hat deinen API-Key abgelehnt. Aktualisier ihn unter Einstellungen → Schlüssel und versuch es erneut.',
       openaiTtsNeedsKey: 'OpenAI-TTS braucht VOICE_TOOLS_OPENAI_KEY oder OPENAI_API_KEY.',
       codeSkewRestartRequired:
-        'Dieses Backend läuft nach einem Update mit altem Code. Starte es neu, um den neuen Code zu laden.'
+        'Dieses Backend läuft nach einem Update mit altem Code. Starte es neu, um den neuen Code zu laden.',
+      restartHermesFailed: 'Hermes konnte nicht neu gestartet werden'
+    },
+    actions: {
+      restartHermes: 'Hermes neu starten',
+      openKeys: 'Schlüssel öffnen',
+      openGateways: 'Gateways öffnen',
+      openMaintenance: 'Wartung öffnen'
     },
     voice: {
       configureSpeechToText: 'Richte Speech-to-Text ein, um den Sprachmodus zu verwenden.',
@@ -257,6 +278,8 @@ export const de = defineLocale({
       tryRecordingAgain: 'Versuch es erneut mit der Aufnahme.',
       unavailable: 'Sprache nicht verfügbar',
       liveEnded: 'Live-Sprachsitzung beendet',
+      liveEndedConnectionLost: 'Die Live-Sprachsitzung hat die Verbindung verloren.',
+      liveEndedClosed: 'Die Live-Sprachsitzung wurde vom Dienst geschlossen.',
       liveError: 'Live-Sprache',
       liveDelegationFailed: 'Anfrage konnte nicht an Hermes übergeben werden',
       liveUnavailable: reason =>
@@ -385,6 +408,7 @@ export const de = defineLocale({
       'view.toggleReview': 'Review-Bereich umschalten',
       'view.toggleStatusbar': 'Statusleiste umschalten',
       'view.toggleTabStrip': 'Tabs umschalten',
+      'view.toggleProfileRail': 'Profil-Leiste ein-/ausblenden',
       'view.showFiles': 'Dateibrowser anzeigen',
       'view.showBrowser': 'Browser öffnen',
       'view.toggleHud': 'HUD-Modus umschalten',
@@ -750,6 +774,13 @@ export const de = defineLocale({
       terminalFontPlaceholder: 'MesloLGS NF oder ein CSS-Font-Stack',
       terminalFontPreview: 'Glyph-Vorschau',
       terminalFontReset: 'Standard verwenden',
+      chatFontTitle: 'Chat-Schrift',
+      chatFontDesc:
+        'Wähl eine installierte Schrift für den Chat und den Rest der App. Praktisch für Lesbarkeitsschriften wie OpenDyslexic; lass das Feld leer, um die Schrift des Themes zu verwenden.',
+      chatFontPlaceholder: 'OpenDyslexic oder ein CSS-Font-Stack',
+      chatFontPreview: 'Vorschau',
+      chatFontSample: 'Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. 0123456789',
+      chatFontReset: 'Theme-Schrift verwenden',
       translucencyTitle: 'Fenster-Transluzenz',
       translucencyDesc:
         'Sieh deinen Desktop durch das ganze Fenster hindurch, inklusive Text. Für hell und dunkel separat abgestimmt.',
@@ -808,6 +839,7 @@ export const de = defineLocale({
       technicalDesc: 'Rohe Tool-Argumente/-Ergebnisse und Low-Level-Details einbeziehen.',
       themeTitle: 'Theme',
       themeDesc: 'Nur Desktop-Paletten. Der gewählte Modus wird oben drauf angewendet.',
+      themeSearchPlaceholder: 'Durchsuch deine Themes oder den VS Code Marketplace…',
       themeProfileNote: profile => `Für das Profil ${profile} gespeichert — jedes Profil behält sein eigenes Theme.`,
       installTitle: 'Aus VS Code installieren',
       installDesc:
@@ -1113,6 +1145,30 @@ export const de = defineLocale({
           'Wenn Hermes sich aus der App selbst aktualisiert (ohne Terminal-Aufforderung), lokale Quellcode-Änderungen behalten (stash) oder verwerfen (discard). Terminal-Updates fragen immer nach.'
       }
     }),
+    uninstallSection: {
+      dangerZone: 'Gefahrenzone',
+      confirmUninstall: 'Deinstallation bestätigen',
+      uninstallHermes: 'Hermes deinstallieren'
+    },
+    poolLimits: {
+      warmBotBackendsAria: 'Bot-Backends vorwärmen',
+      warmBotBackendsTitle: 'Bot-Backends vorwärmen',
+      backendIdleTimeoutAria: 'Leerlauf-Timeout des Backends in Millisekunden',
+      backendIdleTimeoutTitle: 'Leerlauf-Timeout des Backends'
+    },
+    customEndpoints: {
+      title: 'Eigene Endpunkte',
+      deleteEndpoint: 'Endpunkt löschen',
+      emptyDescription: 'Füg unten einen OpenAI-kompatiblen Endpunkt hinzu.',
+      emptyTitle: 'Keine eigenen Endpunkte',
+      namePlaceholder: 'Axet Proxy',
+      contextPlaceholder: 'Automatisch'
+    },
+    computerUse: {
+      accessibility: 'Bedienungshilfen',
+      screenRecording: 'Bildschirmaufnahme',
+      driverHealth: 'Treiberstatus'
+    },
     about: {
       heading: 'Hermes Desktop',
       version: value => `Version ${value}`,
@@ -1178,7 +1234,8 @@ export const de = defineLocale({
       attachmentSizeDesc:
         'Wie groß eine lokale Datei sein darf, die Desktop für Vorschauen und Bildanhänge lädt, in MB. Standard ist 16. Remote-Anhänge ohne Bild verwenden ein eigenes Limit von 256 MB. Wenn du das sehr hoch setzt, wird die gesamte Datei in den Speicher geladen, was die App einfrieren oder zum Absturz bringen kann.',
       attachmentSizeUnit: 'MB',
-      attachmentSizeLabel: 'Maximale Vorschau-/Bildladegröße in Megabyte'
+      attachmentSizeLabel: 'Maximale Vorschau-/Bildladegröße in Megabyte',
+      showOptions: 'Optionen anzeigen'
     },
     quickEntry: {
       enabledTitle: 'Schnelleingabe',
@@ -1297,7 +1354,7 @@ export const de = defineLocale({
       unavailableTitle: 'Gateway-Einstellungen nicht verfügbar',
       unavailableDesc: 'Die Desktop-IPC-Brücke stellt keine Gateway-Einstellungen bereit.',
       title: 'Gateway-Verbindung',
-      envOverride: 'env override',
+      envOverride: 'ENV-Überschreibung',
       intro:
         'Lokal per Standard. Verwende Remote, wenn diese App ein Hermes-Backend woanders steuern soll. Gateway-Verbindungen gelten pro Maschine; Profile werden aus den Gateways ermittelt, mit denen du dich verbindest.',
       envOverrideTitle: 'Umgebungsvariablen steuern diese Desktop-Sitzung.',
@@ -1574,11 +1631,15 @@ export const de = defineLocale({
       setToMain: 'Auf Hauptmodell setzen',
       change: 'Ändern',
       autoUseMain: 'automatisch · Hauptmodell verwenden',
+      inheritMainEffort: 'übernehmen · Aufwand des Hauptmodells',
       providerDefault: '(Anbietervorgabe)',
       fallbackAdd: 'Fallback hinzufügen',
       fallbackEmpty: 'Keine Fallback-Modelle — es wird das Standardmodell verwendet, außer es schlägt fehl.',
       notInCatalog:
         'ist nicht in der Modellliste dieses Anbieters enthalten — Aufrufe können auf ein Backup ausweichen.',
+      moaTitle: 'Mixture of Agents',
+      moaPreset: 'Voreinstellung',
+      moaAggregator: 'Aggregator',
       tasks: {
         vision: {
           label: 'Sehen',
@@ -1607,6 +1668,18 @@ export const de = defineLocale({
         review: {
           label: 'Review',
           hint: '/review Bewertungs-Subagent'
+        },
+        triage_specifier: {
+          label: 'Triage-Spezifizierer',
+          hint: 'Kanban-Spezifikation ausarbeiten'
+        },
+        kanban_decomposer: {
+          label: 'Kanban-Zerleger',
+          hint: 'Aufgaben zerlegen'
+        },
+        profile_describer: {
+          label: 'Profil-Beschreiber',
+          hint: 'Automatische Profilbeschreibungen'
         },
         curator: {
           label: 'Kurator',
@@ -1674,8 +1747,6 @@ export const de = defineLocale({
       upToDateTitle: 'Engine aktuell',
       upToDateDetail: (tag, backend) =>
         `llama.cpp ${tag} (${backend}) wird ausgeführt — der neueste Build, den Hermes mitliefert.`,
-      updateToast: next =>
-        `Ein neuerer lokaler Engine-Build (${next}) ist verfügbar. Update unter Einstellungen → Lokale Modelle.`,
       activeDetail: 'Neue Chats verwenden dieses Modell — es wird geladen, wenn du deine erste Nachricht sendest',
       activeNotLoaded: 'Wird bei deiner ersten Nachricht geladen',
       loadedPill: 'Im Speicher',
@@ -1831,6 +1902,8 @@ export const de = defineLocale({
       nousAuthDoneTitle: 'Nous Portal verbunden',
       nousAuthDoneMessage: 'Deine Abo-Backends sind jetzt aktiv.',
       nousAuthFailed: 'Die Nous-Portal-Anmeldung wurde nicht abgeschlossen',
+      nousAuthFailedMessage: 'Versuch es erneut.',
+      nousAuthTryAgain: 'Erneut versuchen',
       noApiKeyRequired: 'Kein API-Key erforderlich.',
       postSetupHint: step =>
         `Dieses Backend braucht eine einmalige Installation (${step}). Läuft auf diesem Rechner – kann ein paar Minuten dauern.`,
@@ -1844,6 +1917,8 @@ export const de = defineLocale({
       postSetupCompleteMessage: step => `${step} installiert.`,
       postSetupErrorTitle: 'Setup mit Fehlern abgeschlossen',
       postSetupErrorMessage: step => `Prüfe das ${step}-Protokoll.`,
+      postSetupOpenLogs: 'Logs öffnen',
+      postSetupRunAgain: 'Erneut ausführen',
       postSetupFailed: step => `Das ${step}-Setup konnte nicht ausgeführt werden`,
       webSearchActive: backend => `Suche: ${backend}`,
       webExtractActive: backend => `Extrahieren: ${backend}`,
@@ -1875,7 +1950,13 @@ export const de = defineLocale({
         selectedMessage: backend => `Terminal-Befehle laufen jetzt über ${backend}. Gilt für neue Sitzungen.`,
         failedSelect: backend => `${backend} konnte nicht ausgewählt werden`,
         needsSetupHint:
-          'Du kannst dieses Backend jetzt auswählen – Befehle schlagen fehl, bis das Setup abgeschlossen ist.'
+          'Du kannst dieses Backend jetzt auswählen – Befehle schlagen fehl, bis das Setup abgeschlossen ist.',
+        unavailableTitle: 'Terminalbefehle sind nicht verfügbar',
+        unavailableMessage: backend =>
+          `Hermes kann gerade keine Shell-Befehle ausführen: ${backend} ist nicht bereit. Wechsle auf Lokal oder schließ die Einrichtung von ${backend} ab und versuch es erneut.`,
+        openBackendSettings: 'Terminal-Einstellungen öffnen',
+        useLocal: 'Lokal verwenden',
+        switchedToLocal: 'Terminalbefehle laufen jetzt lokal. Gilt für neue Sitzungen.'
       },
       browserRealProfile: {
         label: 'Mein echtes Browser-Profil verwenden',
@@ -2047,6 +2128,11 @@ export const de = defineLocale({
       uninstallStarted: name => `${name} wird deinstalliert...`,
       updateStarted: 'Installierte Skills werden aktualisiert...',
       actionFailed: 'Skill-Aktion fehlgeschlagen',
+      installBlockedTitle: name => `${name} konnte nicht installiert werden`,
+      installBlockedMessage: (findings, unverified) =>
+        `Der Sicherheitsscan hat ${findings > 0 ? `${findings} Punkt${findings === 1 ? '' : 'e'}` : 'riskante Muster'} zum Prüfen markiert${unverified ? ' und der Skill kommt aus einer unbestätigten Quelle' : ''}. Lies den Scan, bevor du dem Autor vertraust.`,
+      viewScan: 'Scan ansehen',
+      openLog: 'Log öffnen',
       actionLog: 'Aktionsprotokoll',
       alreadyInstalled: (name: string) => `"${name}" ist bereits installiert`,
       pickerTitle: 'Skills Hub',
@@ -2229,9 +2315,9 @@ export const de = defineLocale({
         title: 'Einstellungen',
         detail: 'Hermes Desktop konfigurieren'
       },
-      skills: {
+      capabilities: {
         title: 'Fähigkeiten',
-        detail: 'Skills, Tools und MCP-Server'
+        detail: 'Skills, Tools, MCP-Server und Plugins'
       },
       messaging: {
         title: 'Messaging',
@@ -2427,6 +2513,10 @@ export const de = defineLocale({
     restartNow: 'Jetzt neu starten',
     restarting: 'Wird neu gestartet…',
     restartFailedManual: 'Gateway-Neustart fehlgeschlagen — starte es manuell neu und prüfe die Gateway-Logs.',
+    restartFailedManualDetail:
+      'Versuch Neustart erneut; wenn es weiter scheitert, öffne die Logs und schick Diagnosedaten.',
+    restartAgain: 'Erneut neu starten',
+    openLogs: 'Logs öffnen',
     telegramQr: {
       title: 'Wähle, wie du deinen Telegram-Bot verbindest',
       subtitle:
@@ -2788,18 +2878,6 @@ export const de = defineLocale({
     close: 'Cron schließen',
     title: 'Geplante Jobs',
     count: count => `${count} ${count === 1 ? 'Job' : 'Jobs'}`,
-    modelImpact: {
-      title: 'Geplante Jobs brauchen eine Überprüfung',
-      message: count =>
-        `${count} geplante${count === 1 ? 'r' : ''} ${count === 1 ? 'Job' : 'Jobs'} werden übersprungen, bis du die Modelleinstellungen überprüfst.`,
-      detailMore: (names, remaining) => `${names} und ${remaining} weitere`,
-      review: 'Geplante Jobs überprüfen',
-      saveFailed: 'Hermes hat diese Modelländerung nicht gespeichert.',
-      confirmTitle: 'Modellauswahl-Warnung',
-      confirmDetail: 'Bestätige nur, wenn du diesen Kompromiss akzeptierst.',
-      confirmAction: 'Bestätigen',
-      declined: 'Modelländerung abgebrochen — du hast die Warnung zur Data-Training-Tier-Stufe abgelehnt.'
-    },
     search: 'Cron-Jobs durchsuchen...',
     loading: 'Cron-Jobs werden geladen...',
     states: {
@@ -2811,6 +2889,9 @@ export const de = defineLocale({
       error: 'Fehler',
       completed: 'abgeschlossen'
     },
+    lastRunFailed: 'Letzter Lauf fehlgeschlagen:',
+    editJob: 'Job bearbeiten',
+    runAgain: 'Erneut ausführen',
     deliveryLabels: {
       local: 'Dieser Desktop',
       telegram: 'Telegram',
@@ -2999,6 +3080,7 @@ export const de = defineLocale({
       reorder: 'Gruppe neu anordnen',
       actions: 'Gruppenaktionen'
     },
+    profileRail: 'Profil-Leiste',
     nav: {
       'new-session': 'Neue Session',
       skills: 'Fähigkeiten',
@@ -3484,7 +3566,7 @@ export const de = defineLocale({
       noChanges: 'Keine Änderungen',
       notRepo: 'Kein git-Repository',
       noDiff: 'Kein Diff zum Anzeigen',
-      scopeUncommitted: 'Uncommitted',
+      scopeUncommitted: 'Nicht committet',
       scopeBranch: 'Branch',
       scopeLastTurn: 'Letzte Runde',
       commit: 'Commit',
@@ -3527,6 +3609,8 @@ export const de = defineLocale({
     notAvailableTitle: 'Kein Update verfügbar',
     unsupportedMessage: 'Diese Hermes-Version kann sich nicht aus der App heraus aktualisieren.',
     connectionRetry: 'Prüfe deine Verbindung und versuche es erneut.',
+    connectionSettings: 'Verbindungseinstellungen',
+    openDownloadPage: 'Download-Seite öffnen',
     latestBody: 'Du verwendest die neueste Version.',
     latestBodyBackend: 'Das Backend läuft mit der neuesten Version.',
     allSetTitle: 'Alles bereit',
@@ -3640,6 +3724,7 @@ export const de = defineLocale({
     remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
     probing: 'Gateway-Authentifizierung wird erkannt...',
     probeError: 'Dieses Hermes Gateway konnte nicht erreicht werden.',
+    probeErrorDetails: 'Details',
     identityProvider: 'dein Identity-Provider',
     authTitle: 'Authentifizierung',
     authNeedsOauth: provider => `Melde dich mit ${provider} an, bevor du dieses Gateway testest.`,
@@ -3678,7 +3763,8 @@ export const de = defineLocale({
     transcriptSaved: 'Vollständiges Protokoll gespeichert unter',
     copiedOutput: 'Kopiert!',
     copyOutput: 'Ausgabe kopieren',
-    reloadRetry: 'Neu laden und erneut versuchen'
+    reloadRetry: 'Neu laden und erneut versuchen',
+    openLogs: 'Logs öffnen'
   },
   onboarding: {
     headerTitle: 'Lass uns Hermes Agent für dich einrichten',
@@ -3746,6 +3832,11 @@ export const de = defineLocale({
     signInFailed: 'Anmeldung fehlgeschlagen. Versuch es noch einmal.',
     signInExpired:
       'Die Anmeldung ist beim Warten auf die Autorisierung abgelaufen. Das bedeutet meistens, dass die Anmeldeseite im geöffneten Tab hängen geblieben ist (Problem auf Serverseite) – schließe die Anmeldung dort ab und versuch es dann noch einmal. Fällt es weiterhin aus, verwende stattdessen einen API-Key oder den CLI-Rückgriff.',
+    signInDidNotFinish: provider =>
+      `Die Anmeldung bei ${provider} wurde nicht abgeschlossen. Prüf deine Internetverbindung und versuch es erneut oder wähl einen anderen Anbieter.`,
+    tryAgain: 'Erneut versuchen',
+    useApiKeyInstead: 'API-Key verwenden',
+    errorDetails: 'Details',
     pickDifferentProvider: 'Einen anderen Anbieter wählen',
     signInWith: provider => `Mit ${provider} anmelden`,
     openedBrowser: provider => `Wir haben ${provider} in deinem Browser geöffnet.`,
@@ -3812,8 +3903,34 @@ export const de = defineLocale({
     retiredBody:
       'Diese Gratis-Tarif-Identität wurde bereits verwendet oder ist abgelaufen; beim nächsten Start wird eine neue eingerichtet.',
     errorBody: 'Die Anmeldung wurde nicht abgeschlossen; starte sie erneut.',
+    busyHeading: 'Fast geschafft',
+    busyBody: wait =>
+      `Hermes konnte deine Anmeldung nicht abschließen, weil der Nous-Dienst ausgelastet ist. Versuch es in ${wait} erneut. Deine Sitzung bleibt so lange erhalten.`,
+    unreachableBody:
+      'Hermes konnte den Nous-Dienst nicht erreichen, um deine Anmeldung abzuschließen. Prüf deine Internetverbindung und versuch es erneut. Deine Sitzung bleibt erhalten.',
     alreadySignedInHeading: 'Bereits angemeldet.',
-    alreadySignedInBody: 'Dieses Hermes ist bereits mit einem Nous-Konto angemeldet.'
+    alreadySignedInBody: 'Dieses Hermes ist bereits mit einem Nous-Konto angemeldet.',
+    setupFailed: {
+      gateClosed:
+        'Diese Hermes-Version kann ohne Nous-Konto nicht starten. Melde dich an oder leg eines an — kostenlos und in einer Minute erledigt.',
+      paused:
+        'Chatten ohne Anmeldung ist kurz pausiert. Hermes prüft weiter. Die Anmeldung ist kostenlos und du kannst sofort weitermachen.',
+      rateLimited: wait =>
+        `Gerade starten sehr viele Leute, deshalb versucht Hermes es in ${wait} erneut. Die Anmeldung ist kostenlos und überspringt das Warten.`,
+      unreachable:
+        'Hermes konnte den Nous-Dienst nicht erreichen. Prüf deine Internetverbindung und tippe dann auf Erneut versuchen. Oder verbinde vorerst einen anderen Anbieter.',
+      serverError:
+        'Der Nous-Dienst hatte einen Aussetzer. Tippe gleich auf Erneut versuchen oder verbinde vorerst einen anderen Anbieter.',
+      powRequired:
+        'Der Nous-Server wollte einen Proof of Work, aber der ist in deinem Agent noch nicht umgesetzt. Melde dich an oder leg ein kostenloses Nous-Konto an, um fortzufahren.',
+      locked:
+        'Diese Sitzung kann ohne Anmeldung nicht fortgesetzt werden. Melde dich an oder leg ein kostenloses Nous-Konto an, um weiterzumachen.',
+      generic:
+        'Hermes konnte den kostenlosen Zugang ohne Anmeldung nicht einrichten. Die Anmeldung ist kostenlos — oder verbinde einen anderen Anbieter.',
+      signInBelow: 'Die Anmeldung ist kostenlos. Wähl unten Nous.',
+      tryAgain: 'Erneut versuchen',
+      retrying: 'Wird erneut versucht…'
+    }
   },
   modelPicker: {
     title: 'Modell wechseln',
@@ -4247,10 +4364,175 @@ export const de = defineLocale({
         runtime: 'Lokaler Laufzeitfehler',
         streaming: 'Streaming-Verbindungsfehler'
       },
+      errorLayerBodies: {
+        auth: 'Der KI-Dienst hat deine Anmeldung abgelehnt. Prüf die Zugangsdaten für diesen Anbieter und send deine Nachricht erneut.',
+        billing:
+          'Dein Konto hat bei diesem Anbieter kein Guthaben mehr. Lade auf oder wechsle den Anbieter und send erneut.',
+        disk: 'Deine Festplatte ist voll, deshalb konnte Hermes dieses Gespräch nicht speichern. Schaff etwas Platz und versuch es erneut.',
+        endpoint:
+          'Hermes erreicht deinen eigenen Modell-Server nicht. Prüf, ob er läuft, und send deine Nachricht erneut.',
+        gateway:
+          'Beim Starten dieser Antwort ist in Hermes ein internes Problem aufgetreten. Send deine Nachricht erneut; wenn es bleibt, schick Diagnosedaten.',
+        generic: 'Beim Antworten ist etwas schiefgelaufen. Versuch es erneut oder kopier die Details, wenn es bleibt.',
+        provider:
+          'Der KI-Dienst konnte diese Anfrage nicht abschließen. Versuch es gleich erneut oder wechsle den Anbieter.',
+        runtime:
+          'Beim Starten dieser Antwort ist in Hermes ein internes Problem aufgetreten. Send deine Nachricht erneut; wenn es bleibt, schick Diagnosedaten.',
+        streaming:
+          'Die Verbindung ist abgerissen, bevor die Antwort fertig war. Versuch es erneut, um sie noch einmal zu senden.'
+      },
+      errorCodes: {
+        auth: {
+          title: provider => `${provider} hat deine Anmeldung abgelehnt`,
+          body: provider =>
+            `Die für ${provider} gespeicherten Zugangsdaten wurden nicht akzeptiert. Korrigier sie in den Einstellungen oder wechsle den Anbieter und send deine Nachricht erneut.`
+        },
+        auth_permanent: {
+          title: provider => `${provider} hat deine Anmeldung abgelehnt`,
+          body: provider =>
+            `Die für ${provider} gespeicherten Zugangsdaten sind ungültig oder wurden widerrufen. Aktualisier sie oder wechsle den Anbieter und send deine Nachricht erneut.`
+        },
+        billing: {
+          title: 'Kein Guthaben mehr',
+          body: provider =>
+            `Dein ${provider}-Konto hat kein Guthaben mehr. Lade auf oder wechsle den Anbieter und send erneut.`
+        },
+        rate_limit: {
+          title: 'Der KI-Dienst ist ausgelastet',
+          body: provider => `${provider} begrenzt gerade die Anfragen. Warte eine Minute und versuch es erneut.`
+        },
+        upstream_rate_limit: {
+          title: 'Der KI-Dienst ist ausgelastet',
+          body: provider => `${provider} begrenzt gerade die Anfragen. Warte eine Minute und versuch es erneut.`
+        },
+        overloaded: {
+          title: 'Der KI-Dienst ist überlastet',
+          body: provider => `${provider} hat gerade Probleme. Versuch es gleich erneut oder wechsle den Anbieter.`
+        },
+        server_error: {
+          title: 'Beim KI-Dienst ist ein Fehler aufgetreten',
+          body: provider =>
+            `${provider} hat einen Serverfehler zurückgegeben. Versuch es gleich erneut oder wechsle den Anbieter.`
+        },
+        timeout: {
+          title: 'Die Antwort hat zu lange gebraucht',
+          body: provider =>
+            `${provider} hat nicht rechtzeitig geantwortet. Versuch es erneut, um sie noch einmal zu senden.`
+        },
+        stream_drop: {
+          title: 'Die Antwort wurde abgebrochen',
+          body: 'Die Verbindung ist abgerissen, bevor die Antwort fertig war. Versuch es erneut, um sie noch einmal zu senden.'
+        },
+        ssl_cert_verification: {
+          title: 'Sichere Verbindung fehlgeschlagen',
+          body: provider =>
+            `Hermes konnte die sichere Verbindung zu ${provider} nicht prüfen. Prüf deine Netzwerk- oder Proxy-Einstellungen oder wechsle den Anbieter und send deine Nachricht erneut.`
+        },
+        context_overflow: {
+          title: 'Dieses Gespräch ist zu lang',
+          body: 'Das Gespräch passt nicht mehr ins Modell. Komprimier es oder starte einen neuen Chat und send erneut.'
+        },
+        payload_too_large: {
+          title: 'Diese Nachricht ist zu groß',
+          body: 'Die Anfrage war zu groß für das Modell. Komprimier das Gespräch oder starte einen neuen Chat und send erneut.'
+        },
+        model_not_found: {
+          title: 'Dieses Modell ist nicht verfügbar',
+          body: provider =>
+            `${provider} bietet dieses Modell für dein Konto nicht an. Wähl ein anderes Modell und send deine Nachricht erneut.`
+        },
+        provider_policy_blocked: {
+          title: 'Dieses Modell ist durch deine Kontoeinstellungen gesperrt',
+          body: provider =>
+            `${provider} würde diese Anfrage mit den Daten- und Datenschutzeinstellungen deines Kontos nicht weiterleiten. Wähl ein anderes Modell oder wechsle den Anbieter.`
+        },
+        content_policy_blocked: {
+          title: 'Der KI-Dienst hat diese Anfrage abgelehnt',
+          body: provider => `${provider} wollte diese Nachricht nicht beantworten. Änder sie und send erneut.`
+        },
+        format_error: {
+          title: 'Der KI-Dienst hat die Anfrage abgelehnt',
+          body: provider =>
+            `${provider} hat den Aufbau dieser Anfrage nicht akzeptiert. Wechsle den Anbieter oder schick Diagnosedaten, damit wir es prüfen können.`
+        },
+        truncated: {
+          title: 'Die Antwort wurde abgeschnitten',
+          body: 'Das Modell hat vor dem Ende abgebrochen. Versuch es erneut für eine vollständige Antwort.'
+        },
+        invalid_response: {
+          title: 'Der KI-Dienst hat eine unlesbare Antwort geschickt',
+          body: provider =>
+            `${provider} hat etwas zurückgegeben, das Hermes nicht lesen konnte. Versuch es gleich erneut.`
+        },
+        empty_response: {
+          title: 'Der KI-Dienst hat eine leere Antwort geschickt',
+          body: provider => `${provider} hat zu dieser Nachricht nichts zurückgegeben. Versuch es gleich erneut.`
+        },
+        loop_error: {
+          title: 'Hermes ist in einer Schleife hängen geblieben',
+          body: 'Die Antwort hat dieselben Schritte wiederholt, deshalb hat Hermes sie gestoppt. Versuch es erneut oder starte einen neuen Chat, wenn es wieder passiert.'
+        },
+        SESSION_NOT_OWNED: {
+          title: 'Dieser Chat ist woanders offen',
+          body: 'Dieser Chat ist gerade in einem anderen Hermes-Fenster oder Terminal offen. Schließ ihn dort und send deine Nachricht erneut oder starte hier einen neuen Chat.'
+        },
+        disk_full: {
+          title: 'Festplatte voll',
+          body: 'Deine Festplatte ist voll, deshalb konnte Hermes dieses Gespräch nicht speichern. Schaff etwas Platz und versuch es erneut.'
+        },
+        free_tier_disabled: {
+          title: 'Chatten ohne Anmeldung ist gerade abgeschaltet',
+          body: 'Melde dich mit einem Nous-Konto an, um weiterzuschreiben — es ist kostenlos.'
+        },
+        free_tier_rate_limited: {
+          title: 'Du hast das Kontingent fürs Chatten ohne Anmeldung aufgebraucht',
+          body: 'Es wird bald wieder aufgefrischt. Melde dich mit einem Nous-Konto an für ein größeres Kontingent — es ist kostenlos.'
+        },
+        free_tier_at_capacity: {
+          title: 'Chatten ohne Anmeldung ist gerade sehr stark ausgelastet',
+          body: 'Melde dich an, um die Warteschlange zu überspringen — es ist kostenlos — oder versuch es in einer Weile erneut.'
+        },
+        free_tier_model_not_free: {
+          title: 'Dieses Modell gibt es ohne Anmeldung nicht',
+          body: 'Hermes verwendet vorerst das kostenlose Modell. Melde dich mit einem Nous-Konto an für mehr Modelle — es ist kostenlos.'
+        },
+        free_tier_route: {
+          title: 'Hermes hat das kostenlose Modell über diese Route nicht erreicht',
+          body: 'Melde dich mit einem Nous-Konto an — es ist kostenlos — oder prüf die Einstellung NOUS_INFERENCE_BASE_URL.'
+        },
+        free_tier_outage: {
+          title: 'Das kostenlose Modell antwortet gerade schlecht',
+          body: 'Versuch deine Nachricht in einer Minute erneut zu senden.'
+        },
+        free_tier_refused: {
+          title: 'Hermes konnte das ohne Anmeldung nicht senden',
+          body: 'Eine Anmeldung mit einem Nous-Konto ist kostenlos.'
+        }
+      },
+      errorAuthKinds: {
+        api_key: {
+          title: provider => `${provider} hat deinen API-Key abgelehnt`,
+          body: provider =>
+            `Der für ${provider} gespeicherte Key ist ungültig oder wurde widerrufen. Aktualisier ihn und versuch es erneut.`
+        },
+        oauth: {
+          title: provider => `Deine ${provider}-Anmeldung ist abgelaufen`
+        }
+      },
+      errorDetails: 'Details',
+      errorGenericProvider: 'Der KI-Dienst',
+      errorToastTitle: 'Hermes konnte die Antwort nicht fertigstellen',
       errorRetry: 'Erneut versuchen',
       errorStartNewSession: 'Neue Sitzung starten',
       errorSwitchProvider: 'Anbieter wechseln',
+      errorChooseModel: 'Modell wählen',
+      errorCompressConversation: 'Gespräch komprimieren',
+      errorCompressFailed: 'Das Gespräch konnte nicht komprimiert werden',
+      errorOpenHermesFolder: 'Hermes-Ordner öffnen',
+      errorOpenHermesFolderFailed: 'Der Hermes-Ordner konnte nicht geöffnet werden',
+      errorUpdateApiKey: 'API-Key aktualisieren',
       errorSignInAgain: provider => `Melde dich erneut bei ${provider} an`,
+      errorSignInFreeTier: 'Mit einem Nous-Konto anmelden',
       errorOauthExpired: provider =>
         `Deine Anmeldung bei ${provider} ist abgelaufen oder wurde widerrufen. Melde dich erneut an, um weiter zu chatten.`,
       errorOpenLogs: 'Logs öffnen',
@@ -4282,6 +4564,10 @@ export const de = defineLocale({
     approval: {
       gatewayDisconnected: 'Hermes-Gateway ist nicht verbunden',
       sendFailed: 'Genehmigungsantwort konnte nicht gesendet werden',
+      reconnect: 'Neu verbinden',
+      timedOutSystemLine:
+        'Die Freigabe ist abgelaufen — der Befehl wurde nicht ausgeführt. Bitte Hermes, es erneut zu versuchen, oder erhöh das Limit unter Einstellungen → Sicherheit → Freigabe-Timeout.',
+      openSafetySettings: 'Sicherheitseinstellungen öffnen',
       run: 'Ausführen',
       command: 'Befehl',
       moreOptions: 'Weitere Genehmigungsoptionen',
@@ -4312,22 +4598,17 @@ export const de = defineLocale({
       lateAnswerHint: 'Dieser Prompt wartet nicht mehr. Wähle eine Option, um sie als Folgenachricht zu entwerfen.'
     },
     mcpSetup: {
-      installTitle: server => `Den ${server} MCP-Server hinzufügen?`,
-      enableTitle: server => `Den ${server} MCP-Server aktivieren?`,
-      authorizeTitle: server => `Den ${server} MCP-Server autorisieren?`,
+      installTitle: 'MCP-Server hinzufügen',
+      enableTitle: 'MCP-Server aktivieren',
+      authorizeTitle: 'MCP-Server autorisieren',
       installAction: 'Installieren',
       enableAction: 'Aktivieren',
       authorizeAction: 'Autorisieren',
-      decline: 'Nicht jetzt',
-      declined: 'Abgelehnt',
       installed: server => `${server} installiert`,
       enabled: server => `${server} aktiviert`,
       authorized: server => `${server} autorisiert`,
       failed: server => `Einrichtung für ${server} fehlgeschlagen`,
-      unanswered: 'Keine Antwort',
       toolCount: count => (count === 1 ? '1 Tool' : `${count} Tools`),
-      notInCatalog: server => `„${server}“ ist nicht im MCP-Katalog`,
-      catalogSource: 'Aus dem Nous-geprüften Katalog',
       envRequired: 'Fülle zuerst die erforderlichen Anmeldedaten aus',
       sendFailed: 'MCP-Einrichtungsantwort konnte nicht gesendet werden',
       reloadFailed:
@@ -4345,6 +4626,19 @@ export const de = defineLocale({
       copyQuery: 'Abfrage kopieren',
       copyFile: 'Datei kopieren',
       copyPath: 'Pfad kopieren',
+      failedCalls: count => `${count} Tool-Aufruf${count === 1 ? '' : 'e'} fehlgeschlagen`,
+      skillActivity: {
+        loading: 'Skill wird geladen',
+        loaded: 'Skill geladen',
+        loadFailed: 'Skill konnte nicht geladen werden',
+        readingResource: 'Skill-Ressource wird gelesen',
+        readResource: 'Skill-Ressource gelesen',
+        resourceFailed: 'Skill-Ressource konnte nicht gelesen werden',
+        listing: 'Skills werden aufgelistet',
+        listed: 'Skills aufgelistet',
+        listFailed: 'Skills konnten nicht aufgelistet werden',
+        unavailable: 'Skill-Ergebnis nicht verfügbar'
+      },
       outputAlt: 'Tool-Ausgabe',
       rawResponse: 'Rohantwort',
       copyActivity: 'Aktivität kopieren',
@@ -4356,6 +4650,7 @@ export const de = defineLocale({
       statusError: 'Fehler',
       statusRecovered: 'Wiederhergestellt',
       statusDone: 'Fertig',
+      resultUnavailable: 'Ergebnis nicht verfügbar',
       memoryWriteNoted: 'Speicher-Schreiben notiert',
       actions: {
         read: 'Lesen',
@@ -4503,11 +4798,14 @@ export const de = defineLocale({
   },
   prompts: {
     gatewayDisconnected: 'Das Hermes-Gateway ist nicht verbunden',
+    reconnect: 'Neu verbinden',
     sudoSendFailed: 'Sudo-Passwort konnte nicht gesendet werden',
     secretSendFailed: 'Geheimnis konnte nicht gesendet werden',
     sudoTitle: 'Administrator-Passwort',
     sudoDesc:
       'Hermes benötigt dein Sudo-Passwort, um einen privilegierten Befehl auszuführen. Es wird nur an deinen lokalen Agenten gesendet.',
+    sudoCommandUnavailable:
+      'Dieser Agent hat den Befehl nicht geliefert. Brich ab, wenn du ihn im Gespräch nicht überprüfen kannst.',
     sudoPlaceholder: 'Sudo-Passwort',
     secretTitle: 'Geheimnis erforderlich',
     secretDesc: 'Hermes benötigt eine Zugangsdaten, um fortzufahren.',
@@ -4619,7 +4917,8 @@ export const de = defineLocale({
       success: platform => `Übergeben an ${platform}. Jederzeit hier fortsetzen.`,
       systemNote: platform => `↻ Übergeben an ${platform} — jederzeit hier fortsetzen.`,
       failed: error => `Übergabe fehlgeschlagen: ${error}`,
-      timedOut: 'Zeitüberschreitung beim Warten auf das Gateway. Läuft `hermes gateway`?'
+      timedOut: 'Zeitüberschreitung beim Warten auf das Gateway. Läuft `hermes gateway`?',
+      startMessaging: 'Messaging starten'
     }
   },
   tips: {
@@ -4657,6 +4956,11 @@ export const de = defineLocale({
         title: 'Anhängen und befehlen',
         text: 'Tipp @, um eine Datei in die Konversation zu holen, /, um einen Befehl auszuführen.'
       },
+      'local-runtime-update': {
+        title: 'Ein Update für die lokale Engine ist verfügbar',
+        text: 'Aktualisier die Engine, die deine lokalen Modelle ausführt. Laufende lokale Anfragen können unterbrochen werden.',
+        action: 'Jetzt aktualisieren'
+      },
       'local-setup': {
         title: 'Dieses Gerät kann Modelle lokal ausführen',
         text: 'Deine Hardware kann ein lokales Modell bedienen. Chats bleiben auf deinem Computer und kosten nichts.',
@@ -4672,6 +4976,8 @@ export const de = defineLocale({
     genericFailure: 'Etwas ist schiefgelaufen',
     boundaryTitle: 'Etwas ist in der Oberfläche kaputtgegangen',
     boundaryDesc: 'Die Ansicht hat einen unerwarteten Fehler. Deine Chats und Einstellungen sind sicher.',
+    boundaryDetails: 'Details',
+    sendDiagnostics: 'Diagnosedaten senden',
     reloadWindow: 'Fenster neu laden',
     openLogs: 'Logs öffnen'
   },
