@@ -115,13 +115,15 @@ def _cwd_info(session: dict, cwd: str, branch=None) -> dict:
             "desktop_contract": DESKTOP_BACKEND_CONTRACT}
 
 
-def _session_row_summary(row: dict, *, tip_row: dict | None = None, resolved_id=None) -> dict:
-    """Compact session.list row; ``tip_row``/``resolved_id`` come from the compression tip."""
+def _session_row_summary(row: dict, *, tip_row: dict | None = None, resolved_id=None, db=None) -> dict:
+    """Compact session.list row; ``tip_row``/``resolved_id`` come from the compression tip.
+    ``db`` adds ``live_message_count`` (see ``_live_count_field``)."""
     tip_row = tip_row or row
     return {"id": row["id"], **({} if resolved_id is None else {"resolved_id": resolved_id}),
             "title": row.get("title") or "", "preview": tip_row.get("preview") or "",
             "started_at": row.get("started_at") or 0, "message_count": tip_row.get("message_count") or 0,
-            "source": row.get("source") or ""}
+            "source": row.get("source") or "",
+            **({} if db is None else _live_count_field(db, row["id"] if resolved_id is None else resolved_id))}
 
 
 from hermes_state_sessions import INTERNAL_LISTING_SOURCES
@@ -518,7 +520,7 @@ def _session_list_by_title(rid, db, title_lookup: str) -> dict:
         # Real compression continuation only: the resolver's unmarked-child fallback could redirect Bot Chat.
         tip = db.get_compression_tip(row["id"]) or row["id"]
     tip_row = (db.get_session(tip) or row) if tip != row["id"] else row
-    return _ok(rid, {"sessions": [_session_row_summary(row, tip_row=tip_row, resolved_id=tip)]})
+    return _ok(rid, {"sessions": [_session_row_summary(row, tip_row=tip_row, resolved_id=tip, db=db)]})
 
 
 @method("session.list")
@@ -540,6 +542,9 @@ def _(rid, params: dict, db) -> dict:
         include_subagents = bool(db_path) and show_subagent_sessions(Path(db_path).parent)
         rows = _listing_rows(db, max(limit * 2, 200), include_hidden=_flag(params, "include_hidden"),
                              include_subagents=include_subagents)[:limit]
+        # No live_message_count here on purpose: the bulk listing serves rows whose open
+        # paths never demand history (expectHistory defaults false); the count is a
+        # per-session scan and would turn one listing call into hundreds of them.
         return _ok(rid, {"sessions": [_session_row_summary(s) for s in rows]})
     except Exception as e:
         return _err(rid, 5006, str(e))
@@ -736,6 +741,35 @@ def _resume_adopt_stranded(ctx: _Resume) -> None:
         logger.exception("stranded-session adoption failed for %s", ctx.target)
 
 
+def _resume_materialize_minted(ctx: _Resume) -> None:
+    """Row for a minted-but-never-persisted key (#96793): adopt the id, not 4007.
+
+    ``session.create`` mints the stored key but intentionally writes no state.db row
+    until the first prompt (no "Untitled" litter). If the backend dies in that window,
+    the key exists client-side (pinned tile, stored id) but has no row anywhere — and
+    after a restart the in-memory live-lazy lookup above can't find it either, so the
+    resume 4007ed forever. When the target is a well-formed server-minted key, mint
+    the row here and let the normal resume path continue with empty history. Abandoned
+    drafts still leave no row: nothing is written until a client explicitly resumes
+    the exact key. ``create_session`` is an upsert, so a concurrently persisted row is
+    not clobbered (only its NULL model/source columns would fill in).
+    """
+    try:
+        ctx.db.create_session(
+            ctx.target,
+            source=_resolve_session_source(_str_param(ctx.params, "source") or None),
+            model=_resolve_model(),
+            profile_name=profile_name_for_home(ctx.profile_home) or _response_profile_name(ctx.profile),
+        )
+        ctx.found = ctx.db.get_session(ctx.target)
+        logger.info(
+            "materialized session row for minted-but-unpersisted key %s (resume no longer 4007s)",
+            ctx.target,
+        )
+    except Exception:
+        logger.warning("failed to materialize session row for %s", ctx.target, exc_info=True)
+
+
 def _resume_locate(ctx: _Resume) -> dict | None:
     """Resolve ``ctx.target`` to a stored row (``ctx.found``); a dict is an early response."""
     ctx.found = ctx.db.get_session(ctx.target)
@@ -755,6 +789,9 @@ def _resume_locate(ctx: _Resume) -> dict | None:
         return _resume_live_unpersisted(ctx, live_sid, live)
     if ctx.owns_db:
         _resume_adopt_stranded(ctx)
+    if not ctx.found and not ctx.lazy and _is_server_minted_key(ctx.target) \
+            and not _any_live_session_claims_key(ctx.target):
+        _resume_materialize_minted(ctx)
     return None if ctx.found else _err(ctx.rid, 4007, "session not found")
 
 
